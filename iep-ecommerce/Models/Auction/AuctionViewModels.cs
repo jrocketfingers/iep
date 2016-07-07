@@ -14,6 +14,6 @@ namespace iep_ecommerce.Models.Auction
         public double LowerBound { get; set; }
         public double UpperBound { get; set; }
 
-        public Auction.Stat
+        public Auction.State State { get; set; }
     }
 }
