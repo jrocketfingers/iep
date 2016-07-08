@@ -7,12 +7,25 @@ using System.Web;
 
 namespace iep_ecommerce.Models
 {
+    public class AuctionNotReadyException : Exception { }
+    public class NotEnoughTokensException : Exception { }
+
     public class Bid
     {
+        public Bid(ApplicationUser user, Auction auction)
+        {
+            this.User = user;
+            this.Auction = auction;
+        }
+
         [Key]
         public Guid Id { get; set; }
 
         public double value = 1;
+
+        public ApplicationUser User { get; set; }
+
+        public Auction Auction { get; set; }
     }
 
     public class Auction
@@ -22,8 +35,6 @@ namespace iep_ecommerce.Models
         private string title;
         private long duration;
         private double startingPrice;
-
-        public class AuctionNotReadyException: Exception { }
 
         public Auction() { }
 

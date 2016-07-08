@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System.Collections.Generic;
 
 namespace iep_ecommerce.Models
 {
@@ -20,12 +21,23 @@ namespace iep_ecommerce.Models
         public ApplicationUser()
         {
             Tokens = 0;
+            Bids = new List<Bid>();
         }
 
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
         public int Tokens { get; set; }
+
+        public ICollection<Bid> Bids { get; set; }
+
+        public void Bid(Auction auction)
+        {
+            if (Tokens == 0)
+                throw new NotEnoughTokensException();
+
+            auction.bid(new Bid(this, auction));
+        }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>

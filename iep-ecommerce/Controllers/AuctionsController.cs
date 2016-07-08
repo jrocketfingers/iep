@@ -147,6 +147,26 @@ namespace iep_ecommerce.Controllers
             return RedirectToAction("Index");
         }
 
+        public ActionResult Bid(Guid id)
+        {
+            Auction auction = db.Auctions.Find(id);
+
+            try
+            {
+                var userId = User.Identity.GetUserId();
+                var user = db.Users.FirstOrDefault(x => x.Id == userId);
+                user.Bid(auction);
+            }
+            catch (NotEnoughTokensException)
+            {
+                FlashMessage.Queue("<a href=\"" + Url.Action("Buy", "Tokens", null, Request.Url.Scheme) + "\">Buy some.</a>", "Not enough tokens to bid.", FlashMessageType.Danger, true);
+
+                return RedirectToAction("Index");
+            }
+
+            return RedirectToAction("Index");
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
