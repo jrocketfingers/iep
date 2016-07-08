@@ -22,10 +22,22 @@ namespace iep_ecommerce.Tests.Features
         public void TestBidsAuctionValue()
         {
             var auction = new Auction("Test Auction", 10);
+            var user = new ApplicationUser();
+            user.Tokens++;
 
-            auction.bid(new Bid());
+            user.Bid(auction);
 
             Assert.AreEqual(11, auction.getValue());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(NotEnoughTokensException))]
+        public void TestBidWithoutTokens()
+        {
+            var auction = new Auction("Test Auction", 10);
+            var user = new ApplicationUser();
+
+            user.Bid(auction);
         }
     }
 }
