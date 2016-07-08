@@ -15,16 +15,32 @@ namespace iep_ecommerce.Controllers
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Auctions
-        public ActionResult Index(String searchString, double lowerPriceBound, double higherPriceBound, Auction.State state)
+        public ActionResult Index(String searchString = null, double? lowerPriceBound = null, double? higherPriceBound = null, Auction.State? status = null)
         {
             var auctions = from m in db.Auctions
                            select m;
 
             if(!String.IsNullOrEmpty(searchString))
             {
-                var searchedAuctions = auctions.Where(s => s.Name.Contains(searchString));
+                auctions = auctions.Where(s => s.Title.Contains(searchString));
             }
-            return View(db.Auctions.ToList());
+
+            if(lowerPriceBound != null)
+            {
+                auctions = auctions.Where(s => s.getValue() >= lowerPriceBound);
+            }
+
+            if(higherPriceBound != null)
+            {
+                auctions = auctions.Where(s => s.getValue() <= higherPriceBound);
+            }
+
+            if(status != null)
+            {
+                auctions = auctions.Where(s => s.Status == status);
+            }
+
+            return View(auctions.ToList());
         }
 
         // GET: Auctions/Details/5
