@@ -6,7 +6,9 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.AspNet.Identity;
 using iep_ecommerce.Models;
+using Vereyon.Web;
 
 namespace iep_ecommerce.Controllers
 {
