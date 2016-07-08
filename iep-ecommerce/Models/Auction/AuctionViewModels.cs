@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
-namespace iep_ecommerce.Models.Auction
-{
+namespace iep_ecommerce.Models {
     public class AuctionSearchListViewModel
     {
         [Display(Name = "Title")]
