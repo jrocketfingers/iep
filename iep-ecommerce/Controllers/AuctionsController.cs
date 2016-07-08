@@ -55,7 +55,7 @@ namespace iep_ecommerce.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin")]
-        public ActionResult Create([Bind(Include = "Id,Name,StartingPrice,Duration,CreatedAt,OpenedAt,ClosedAt,Status")] Auction auction)
+        public ActionResult Create([Bind(Include = "Id,Title,StartingPrice,Duration,CreatedAt,OpenedAt,ClosedAt,Status")] Auction auction)
         {
             if (ModelState.IsValid)
             {

@@ -19,7 +19,7 @@ namespace iep_ecommerce.Models
     {
         public enum State { DRAFT, READY, OPEN, SOLD, EXPIRED };
 
-        private string name;
+        private string title;
         private long duration;
         private double startingPrice;
 
@@ -27,10 +27,10 @@ namespace iep_ecommerce.Models
 
         public Auction() { }
 
-        public Auction(string name, double startingPrice)
+        public Auction(string title, double startingPrice)
         {
             Status = Auction.State.DRAFT;
-            this.name = name;
+            this.title = title;
             this.startingPrice = startingPrice;
 
             Bids = new List<Bid>();
@@ -40,14 +40,15 @@ namespace iep_ecommerce.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
-        public string Name {
-            get { return name; }
+        [Required]
+        public string Title {
+            get { return title; }
             set
             {
                 if (Status != State.DRAFT)
                     throw new AuctionNotReadyException();
 
-                name = value;
+                title = value;
             }
         }
 
