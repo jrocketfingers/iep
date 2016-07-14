@@ -9,14 +9,17 @@ using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using iep_ecommerce.Models;
 using Vereyon.Web;
+using Hangfire;
 
 namespace iep_ecommerce.Controllers
 {
+    [Authorize]
     public class AuctionsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
 
         // GET: Auctions
+        [AllowAnonymous]
         public ActionResult Index(String searchString = null, double? lowerPriceBound = null, double? higherPriceBound = null, Auction.State? status = null)
         {
             var auctions = from m in db.Auctions
@@ -42,10 +45,18 @@ namespace iep_ecommerce.Controllers
                 auctions = auctions.Where(s => s.Status == status);
             }
 
+            var userId = User.Identity.GetUserId();
+
+            if(userId != null) {
+                var user = db.Users.FirstOrDefault(x => x.Id == userId);
+                ViewBag.Tokens = user.Tokens;
+            }
+
             return View(auctions.ToList());
         }
 
         // GET: Auctions/Details/5
+        [AllowAnonymous]
         public ActionResult Details(Guid? id)
         {
             if (id == null)
@@ -149,13 +160,14 @@ namespace iep_ecommerce.Controllers
 
         public ActionResult Bid(Guid id)
         {
-            Auction auction = db.Auctions.Find(id);
+            Auction auction = db.Auctions.FirstOrDefault(x => x.Id == id);
 
             try
             {
                 var userId = User.Identity.GetUserId();
                 var user = db.Users.FirstOrDefault(x => x.Id == userId);
-                user.Bid(auction);
+
+                auction.bid(user, db);
             }
             catch (NotEnoughTokensException)
             {
@@ -163,6 +175,20 @@ namespace iep_ecommerce.Controllers
 
                 return RedirectToAction("Index");
             }
+
+            return RedirectToAction("Index");
+        }
+
+        [Authorize(Roles = "admin")]
+        public ActionResult Start(Guid id)
+        {
+            var auction = db.Auctions.Find(id);
+
+            auction.start(db);
+            var jobid = BackgroundJob.Schedule(() => auction.finish(), TimeSpan.FromSeconds(auction.Duration));
+            db.SaveChanges();
+
+            FlashMessage.Confirmation("Successfully started " + auction.Title);
 
             return RedirectToAction("Index");
         }

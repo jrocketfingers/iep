@@ -51,11 +51,11 @@
         </dd>
 
         <dt>
-            @Html.DisplayNameFor(model => model.ClosedAt)
+            @Html.DisplayNameFor(model => model.ClosesAt)
         </dt>
 
         <dd>
-            @Html.DisplayFor(model => model.ClosedAt)
+            @Html.DisplayFor(model => model.ClosesAt)
         </dd>
 
         <dt>
@@ -72,3 +72,11 @@
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
     @Html.ActionLink("Back to List", "Index")
 </p>
+
+<h2>Bids</h2>
+<ul>
+    @foreach (var item in Model.Bids)
+    {
+        <li>@Html.DisplayFor(modelItem => item.User.Email)</li>
+    }
+</ul>

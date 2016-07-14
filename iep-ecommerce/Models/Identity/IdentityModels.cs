@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -7,6 +8,8 @@ using System.Collections.Generic;
 
 namespace iep_ecommerce.Models
 {
+    public class NotEnoughTokensException : Exception { }
+
     // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
     public class ApplicationUser : IdentityUser
     {
@@ -29,15 +32,19 @@ namespace iep_ecommerce.Models
 
         public int Tokens { get; set; }
 
-        public ICollection<Bid> Bids { get; set; }
-
-        public void Bid(Auction auction)
+        public void useToken(ApplicationDbContext context = null)
         {
-            if (Tokens == 0)
+            if (Tokens > 0)
+            {
+                Tokens--;
+                if (context != null) context.SaveChanges();
+            }
+            else
                 throw new NotEnoughTokensException();
 
-            auction.bid(new Bid(this, auction));
         }
+
+        public ICollection<Bid> Bids { get; set; }
     }
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
