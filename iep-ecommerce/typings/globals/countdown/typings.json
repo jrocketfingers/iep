@@ -1,0 +1,8 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/0c98b1516770cb564d106abc8adf92c560e4eb13/countdown/countdown.d.ts",
+    "raw": "registry:dt/countdown#0.0.0+20160724063151",
+    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/0c98b1516770cb564d106abc8adf92c560e4eb13/countdown/countdown.d.ts"
+  }
+}

@@ -1,0 +1,10 @@
+﻿@using iep_ecommerce.Models
+@using iep_ecommerce.Models.ViewModels
+@using Microsoft.AspNet.Identity
+
+<li>@Html.ActionLink("Auctions", "Index", "Auctions")</li>
+@if (User.Identity.IsAuthenticated && !User.IsInRole("admin"))
+{
+    <li><a id="won-auctions" href='@Url.Action("Index", "Auctions", new { Winner = User.Identity.GetUserId(), Status = Auction.State.SOLD }))'>Won Auctions</a></li>
+}
+<li>@Html.Partial("_LoginPartial")</li>

@@ -6,6 +6,8 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using System.Collections.Generic;
 
+using iep_ecommerce.Models.Tokens;
+
 namespace iep_ecommerce.Models
 {
     public class NotEnoughTokensException : Exception { }
@@ -50,12 +52,13 @@ namespace iep_ecommerce.Models
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext()
-            : base("DefaultConnection", throwIfV1Schema: false)
+            : base("AzureConnection", throwIfV1Schema: false)
         {
         }
 
         public DbSet<Auction> Auctions { get; set; }
         public DbSet<Bid> Bids { get; set; }
+        public DbSet<Order> Orders { get; set; }
 
         public static ApplicationDbContext Create()
         {

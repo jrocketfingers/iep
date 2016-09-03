@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using Microsoft.AspNet.Identity;
 using iep_ecommerce.Models;
+using iep_ecommerce.Models.ViewModels;
 using Vereyon.Web;
 using Hangfire;
 
@@ -20,29 +21,76 @@ namespace iep_ecommerce.Controllers
 
         // GET: Auctions
         [AllowAnonymous]
-        public ActionResult Index(String searchString = null, double? lowerPriceBound = null, double? higherPriceBound = null, Auction.State? status = null)
+        public ActionResult Index(String SearchString = null, double? LowerPriceBound = null, double? HigherPriceBound = null, Auction.State? Status = null, String Winner = null)
         {
-            var auctions = from m in db.Auctions
-                           select m;
+            var AuctionsQuery = from m in db.Auctions
+                                select m;
 
-            if(!String.IsNullOrEmpty(searchString))
+            if(Winner != null)
             {
-                auctions = auctions.Where(s => s.Title.Contains(searchString));
+                ViewBag.Title = "Won auctions";
+            }
+            else
+            {
+                ViewBag.Title = "Available auctions";
             }
 
-            if(lowerPriceBound != null)
+            IEnumerable<Auction.State> values = Enum.GetValues(typeof(Auction.State)).Cast<Auction.State>();
+
+            if(!User.IsInRole("admin"))
             {
-                auctions = auctions.Where(s => s.getValue() >= lowerPriceBound);
+
+                List<Auction.State> admin_visible_values = new List<Auction.State>();
+                admin_visible_values.Add(Auction.State.READY);
+                admin_visible_values.Add(Auction.State.DRAFT);
+
+                values = values.Except(admin_visible_values);
             }
 
-            if(higherPriceBound != null)
+            IEnumerable<SelectListItem> status_items = from value in values
+                                                       select new SelectListItem
+                                                       {
+                                                           Text = value.ToString(),
+                                                           Value = value.ToString(),
+                                                           Selected = value == Status
+                                                       };
+
+            ViewBag.Status = status_items;
+
+            if(!User.IsInRole("admin"))
             {
-                auctions = auctions.Where(s => s.getValue() <= higherPriceBound);
+                AuctionsQuery = AuctionsQuery.Where(s => s.Status != Auction.State.DRAFT && s.Status != Auction.State.READY);
             }
 
-            if(status != null)
+            var Auctions = AuctionsQuery.ToList();
+
+            if(!String.IsNullOrEmpty(SearchString))
             {
-                auctions = auctions.Where(s => s.Status == status);
+                Auctions = Auctions.FindAll(s => s.Title.Contains(SearchString));
+            }
+
+            if(LowerPriceBound != null)
+            {
+                Auctions = Auctions.FindAll(s => s.getValue() >= LowerPriceBound);
+            }
+
+            if(HigherPriceBound != null)
+            {
+                Auctions = Auctions.FindAll(s => s.getValue() <= HigherPriceBound);
+            }
+
+            if(Status != null)
+            {
+                Auctions = Auctions.FindAll(s => s.Status == Status);
+            }
+            else if(!User.IsInRole("admin"))
+            {
+                Auctions = Auctions.FindAll(s => s.Status == Auction.State.OPEN);
+            }
+
+            if(Winner != null)
+            {
+                Auctions = Auctions.FindAll(s => s.getLastBidder().Id == Winner);
             }
 
             var userId = User.Identity.GetUserId();
@@ -52,7 +100,13 @@ namespace iep_ecommerce.Controllers
                 ViewBag.Tokens = user.Tokens;
             }
 
-            return View(auctions.ToList());
+            var model = new AuctionIndexViewModel();
+            model.Auctions = Auctions;
+            model.LowerPriceBound = LowerPriceBound;
+            model.HigherPriceBound = HigherPriceBound;
+            model.State = Status;
+
+            return View(model);
         }
 
         // GET: Auctions/Details/5
@@ -84,7 +138,7 @@ namespace iep_ecommerce.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin")]
-        public ActionResult Create([Bind(Include = "Id,Title,StartingPrice,Duration,CreatedAt,OpenedAt,ClosedAt,Status")] Auction auction)
+        public ActionResult Create([Bind(Include = "Id,Title,StartingPrice,Duration,CreatedAt,OpenedAt,ClosesAt,Status")] Auction auction)
         {
             if (ModelState.IsValid)
             {
@@ -119,7 +173,7 @@ namespace iep_ecommerce.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "admin")]
-        public ActionResult Edit([Bind(Include = "Id,Name,StartingPrice,Duration,CreatedAt,OpenedAt,ClosedAt,Status")] Auction auction)
+        public ActionResult Edit([Bind(Include = "Id,Title,StartingPrice,Duration,CreatedAt,OpenedAt,ClosedAt,Status")] Auction auction)
         {
             if (ModelState.IsValid)
             {
@@ -185,12 +239,24 @@ namespace iep_ecommerce.Controllers
             var auction = db.Auctions.Find(id);
 
             auction.start(db);
-            var jobid = BackgroundJob.Schedule(() => auction.finish(), TimeSpan.FromSeconds(auction.Duration));
             db.SaveChanges();
 
             FlashMessage.Confirmation("Successfully started " + auction.Title);
 
-            return RedirectToAction("Index");
+            return Redirect(Request.UrlReferrer.ToString()); 
+        }
+
+        [Authorize(Roles = "admin")]
+        public ActionResult Stop(Guid id)
+        {
+            var auction = db.Auctions.Find(id);
+
+            auction.stop(db);
+            db.SaveChanges();
+
+            FlashMessage.Confirmation("Successfully stopped " + auction.Title);
+
+            return Redirect(Request.UrlReferrer.ToString());
         }
 
         protected override void Dispose(bool disposing)

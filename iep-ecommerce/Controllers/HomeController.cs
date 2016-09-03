@@ -10,7 +10,7 @@ namespace iep_ecommerce.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "Auctions");
         }
 
         public ActionResult About()

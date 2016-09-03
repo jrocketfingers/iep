@@ -5,8 +5,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - Illegal Penny Auctions</title>
-    @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+    @Styles.Render("~/Content/material")
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    @Styles.Render("~/Content/nouislider")
+    @Styles.Render("~/Content/custom")
 
     <script type="text/javascript">
         var appInsights=window.appInsights||function(config){
@@ -18,31 +21,27 @@
         window.appInsights=appInsights;
         appInsights.trackPageView();
     </script>
+
 </head>
+
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                @Html.ActionLink("Illegal Penny Auctions", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("Auctions", "Index", "Auctions")</li>
-                </ul>
-                @Html.Partial("_LoginPartial")
-            </div>
+    <nav class="blue-grey">
+        <div class="nav-wrapper container">
+            @Html.ActionLink("Illegal Penny Auctions", "Index", "Auctions", new { area = "" }, new { @class = "brand-logo hide-on-med-and-down" })
+            @Html.ActionLink("ILP", "Index", "Auctions", new { area = "" }, new { @class = "brand-logo hide-on-large-only" })
+            <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                @{ Html.RenderPartial("_NavbarLinks"); }
+            </ul>
+
+            <ul id="mobile-demo" class="side-nav">
+                @{ Html.RenderPartial("_NavbarLinks"); }
+            </ul>
         </div>
-    </div>
-    <div class="container body-content">
-        @Html.RenderFlashMessages()
+    </nav>
+
+    <div class="container">
         @RenderBody()
-        <hr />
         <div class="row">
             <footer>
                 <p>&copy; @DateTime.Now.Year - Illegal Penny Auctions</p>
@@ -50,8 +49,24 @@
         </div>
     </div>
 
+    @Scripts.Render("~/bundles/utils")
     @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/material")
+    @Scripts.Render("~/bundles/nouislider")
+    @Scripts.Render("~/bundles/animation")
+    <script type="text/javascript" src="https://stage.centili.com/widget/js/c-mobile-payment-scripts.js"></script>
+    
+    @Scripts.Render("~/bundles/app")
+    <script type="text/javascript">
+        $(function () {
+            @foreach(var message in FlashMessage.Retrieve(Html.ViewContext.HttpContext))
+            {
+                <text>
+                    Materialize.toast("@message.Message", 5000);
+                </text>
+            }
+        });
+    </script>
     @RenderSection("scripts", required: false)
 </body>
 </html>

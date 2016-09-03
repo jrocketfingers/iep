@@ -11,10 +11,11 @@ namespace iep_ecommerce
         {
             ConfigureAuth(app);
 
-            GlobalConfiguration.Configuration.UseSqlServerStorage("DefaultConnection");
+            GlobalConfiguration.Configuration.UseSqlServerStorage("AzureConnection");
 
             app.UseHangfireServer();
             app.UseHangfireDashboard();
+            app.MapSignalR();
         }
 
     }

@@ -1,9 +1,4 @@
-﻿body {
-    padding-top: 50px;
-    padding-bottom: 20px;
-}
-
-/* Set padding to keep content from hitting the edges */
+﻿/* Set padding to keep content from hitting the edges */
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
@@ -21,4 +16,59 @@ input,
 select,
 textarea {
     max-width: 280px;
+}
+
+.auction-winner {
+    font-weight: bolder;
+    display: inline-block;
+
+    animation-duration: 0.2s;
+    animation-delay: 0;
+}
+
+.input-field {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.slider.filter {
+    width: 240px;
+    margin-left: 1rem;
+}
+
+.select-wrapper span.caret {
+    top: 0px;
+}
+
+.select-wrapper + label {
+    top: -28px;
+}
+
+.noUi-tooltip {
+    padding: 5px;
+    line-height: initial;
+}
+
+.noUi-horizontal .noUi-handle-upper .noUi-tooltip {
+    bottom: 40px;
+}
+
+.noUi-horizontal .noUi-tooltip.docked-left {
+    left: 0;
+}
+
+.noUi-horizontal .noUi-tooltip.docked-right {
+    right: 0;
+}
+
+.noUi-horizontal .noUi-handle-lower .noUi-tooltip {
+    top: 40px;
+}
+
+.slider.filter {
+    top: 7em;
+}
+
+.input-field.slider-container {
+    height: 11em;
 }
